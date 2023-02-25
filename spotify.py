@@ -39,9 +39,9 @@ class Spotify:
 		'''
 		results = self.spotify.search(artist['name'], limit=limit, offset=offset, type='track', market=None)['tracks']['items']
 		if not results or any(self.days_since_release(item) > self.lookback_days for item in results):
-			return [self.uri_to_id(item['uri']) for item in results if self.days_since_release(item) <= self.lookback_days and any(search_artist['uri'] == artist['uri'] for search_artist in item['artists'])]
+			return [self.uri_to_id(item['uri']) for item in results if self.days_since_release(item) <= self.lookback_days and any(search_artist['uri'] == artist['uri'] for search_artist in item['artists']) and item['album']['album_type'] != 'compilation']
 		else:
-			return [self.uri_to_id(item['uri']) for item in results if self.days_since_release(item) <= self.lookback_days and any(search_artist['uri'] == artist['uri'] for search_artist in item['artists'])] + self.get_artist_track_ids(artist_uri, limit, offset + limit)
+			return [self.uri_to_id(item['uri']) for item in results if self.days_since_release(item) <= self.lookback_days and any(search_artist['uri'] == artist['uri'] for search_artist in item['artists']) and item['album']['album_type'] != 'compilation'] + self.get_artist_track_ids(artist_uri, limit, offset + limit)
 
 	def get_followed_artists(self, limit=20, after=None):
 		'''Obtain all artists the authenticated user follows.
