@@ -99,6 +99,7 @@ To get a local copy up and running follow these simple example steps.
 ## Roadmap
 
 - [x] Automate population of Spotify playlist from followed artists
+- [x] Make recent track search more robust
 - [ ] Add support for explicit content preferences
 - [ ] Add error handling as issues arise
 

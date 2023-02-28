@@ -9,19 +9,31 @@ if __name__ == '__main__':
 		os.environ['SPOTIPY_REDIRECT_URI'] = config['redirectURI']
 		while True:
 			sp = Spotify(config['username'], config['scope'] + ' user-follow-read', config['lookbackDays'])
-			print('{}\r'.format(center('[{}] Gathering followed arists...'.format(smart_time()), display=False)), end='')
+			print('{}\r'.format(center('[{}] Gathering playlist tracks...'.format(smart_time()), display=False)), end='')
+			playlist_tracks = sp.get_playlist_track_ids(config['playlistId'])
+			center('[{}] Successfully gathered {:,} playlist tracks.'.format(smart_time(), len(playlist_tracks)))
+			print('{}\r'.format(center('[{}] Gathering followed artists...'.format(smart_time()), display=False)), end='')
 			followed_artists = sp.get_followed_artists()
-			center('[{}] Successfully gathered {:,} followed arists.'.format(smart_time(), len(followed_artists)))
+			center('[{}] Successfully gathered {:,} followed artists.'.format(smart_time(), len(followed_artists)))
 			track_ids = []
-			print('{}\r'.format(center('[{}] Gathering recent songs from followed arists...'.format(smart_time()), display=False)), end='')
+			print('{}\r'.format(center('[{}] Gathering recent songs from followed artists...'.format(smart_time()), display=False)), end='')
 			for artist in sorted(followed_artists, key=lambda d: d['name']) :
 				print('{}\r'.format(center('[{}] Gathering recent songs from {}...'.format(smart_time(), artist['name']), display=False)), end='')
-				track_ids.extend(sp.get_artist_track_ids(artist))
+				track_ids.extend(sp.get_artist_track_ids(artist['uri']))
 			track_ids = list(set(track_ids))
 			center('[{}] Successfully gathered {:,} recent songs from {:,} artists.'.format(smart_time(), len(track_ids), len(followed_artists)))
-			if track_ids:
-				sp.spotify.playlist_replace_items(config['playlistId'], track_ids)
-				center('[{}] Successfully updated playlist.'.format(smart_time()))
+			to_add = [track_id for track_id in track_ids if track_id not in playlist_tracks]
+			to_remove = [track_id for track_id in playlist_tracks if track_id not in track_ids]
+			if to_add or to_remove:
+				if to_remove:
+					sp.spotify.playlist_remove_all_occurrences_of_items(config['playlistId'], to_remove)
+					center('[{}] Successfully removed {:,} song{} from the playlist.'.format(smart_time(), len(to_remove), 's' if len(to_remove) > 1 else ''))
+				if to_add:
+					for i in range(0, len(to_add), 100):
+						sp.spotify.playlist_add_items(config['playlistId'], to_add[i:i+100])
+					center('[{}] Successfully added {:,} song{} to the playlist.'.format(smart_time(), len(to_add), 's' if len(to_add) > 1 else ''))
+			else:
+				center('[{}] No updates to be made.'.format(smart_time()))
 			smart_sleep(3600)
 	else:
 		center('[{}] Please set environment variables, SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET, before proceeding.'.format(smart_time()))
