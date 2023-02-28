@@ -86,7 +86,8 @@ To get a local copy up and running follow these simple example steps.
        "username": "yap8b0pkw7hdeqbfydk2cyj0a", # Obtained from https://www.spotify.com/us/account/overview
        "playlistId": "58iW4JvNgkpt9ezuuC3TC7", # Obtained from back-half of playlist URL (Ex: https://open.spotify.com/playlist/5GUwELpSDAMqIEqfdJmozJ)
        "scope": "playlist-modify-public", # Authorization scope for modifying the aforementioned playlistId (playlist-modify-public or playlist-modify-private)
-       "lookbackDays": 14 # Maximum number of days ago a song was released to be a part of the playlist
+       "lookbackDays": 14, # Maximum number of days ago a song was released to be a part of the playlist
+       "explicit": true # true if explicit songs should be included and preferred to their clean counterpart, false to avoid explicit tracks altogether
    }
    ```
 6. Run main.py
@@ -100,7 +101,7 @@ To get a local copy up and running follow these simple example steps.
 
 - [x] Automate population of Spotify playlist from followed artists
 - [x] Make recent track search more robust
-- [ ] Add support for explicit content preferences
+- [x] Add support for explicit content preferences
 - [ ] Add error handling as issues arise
 
 See the [open issues](https://github.com/DefNotAvg/SpotifyFavorites/issues) for a full list of proposed features (and known issues).

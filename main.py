@@ -1,4 +1,5 @@
 import os
+import pandas
 from helpers import *
 from spotify import Spotify
 
@@ -8,19 +9,21 @@ if __name__ == '__main__':
 		config = load_from_json('config.json')
 		os.environ['SPOTIPY_REDIRECT_URI'] = config['redirectURI']
 		while True:
-			sp = Spotify(config['username'], config['scope'] + ' user-follow-read', config['lookbackDays'])
+			sp = Spotify(config['username'], config['scope'] + ' user-follow-read', config['lookbackDays'], config['explicit'])
 			print('{}\r'.format(center('[{}] Gathering playlist tracks...'.format(smart_time()), display=False)), end='')
 			playlist_tracks = sp.get_playlist_track_ids(config['playlistId'])
 			center('[{}] Successfully gathered {:,} playlist tracks.'.format(smart_time(), len(playlist_tracks)))
 			print('{}\r'.format(center('[{}] Gathering followed artists...'.format(smart_time()), display=False)), end='')
 			followed_artists = sp.get_followed_artists()
 			center('[{}] Successfully gathered {:,} followed artists.'.format(smart_time(), len(followed_artists)))
-			track_ids = []
+			tracks = []
 			print('{}\r'.format(center('[{}] Gathering recent songs from followed artists...'.format(smart_time()), display=False)), end='')
-			for artist in sorted(followed_artists, key=lambda d: d['name']) :
+			for artist in sorted(followed_artists, key=lambda d: d['name']):
 				print('{}\r'.format(center('[{}] Gathering recent songs from {}...'.format(smart_time(), artist['name']), display=False)), end='')
-				track_ids.extend(sp.get_artist_track_ids(artist['uri']))
-			track_ids = list(set(track_ids))
+				tracks.extend(sp.get_artist_tracks(artist['uri']))
+			df = pandas.DataFrame.from_dict(tracks)
+			df['rowNum'] = df.sort_values(['explicit', 'albumType'], ascending=[False, True]).groupby(['name', 'artists'], sort=False).cumcount().add(1)
+			track_ids = list(set([item['id'] for item in df.to_dict('records') if item['rowNum'] == 1]))
 			center('[{}] Successfully gathered {:,} recent songs from {:,} artists.'.format(smart_time(), len(track_ids), len(followed_artists)))
 			to_add = [track_id for track_id in track_ids if track_id not in playlist_tracks]
 			to_remove = [track_id for track_id in playlist_tracks if track_id not in track_ids]

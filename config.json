@@ -3,5 +3,6 @@
     "username": "yap8b0pkw7hdeqbfydk2cyj0a",
     "playlistId": "58iW4JvNgkpt9ezuuC3TC7",
     "scope": "playlist-modify-public",
-    "lookbackDays": 14
+    "lookbackDays": 14,
+    "explicit": true
 }
