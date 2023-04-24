@@ -95,7 +95,7 @@ class Spotify:
 		if not results or len(results) < limit:
 			return [self.track_info(item, album_type) for item in results if (self.explicit or not item['explicit']) and any(artist['uri'] == artist_uri for artist in item['artists'])]
 		else:
-			return [self.track_info(item, album_type) for item in results if (self.explicit or not item['explicit']) and any(artist['uri'] == artist_uri for artist in item['artists'])] + self.get_album_track_ids(album_id, album_type, artist_uri, limit=limit, offset=offset + limit)
+			return [self.track_info(item, album_type) for item in results if (self.explicit or not item['explicit']) and any(artist['uri'] == artist_uri for artist in item['artists'])] + self.get_album_tracks(album_id, album_type, artist_uri, limit=limit, offset=offset + limit)
 
 	def get_artist_albums(self, artist_uri, limit=50, offset=0):
 		'''Obtain album IDs from the specified artist released in the last self.lookback_days days.
