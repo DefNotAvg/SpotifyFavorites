@@ -29,7 +29,8 @@ if __name__ == '__main__':
 			to_remove = [track_id for track_id in playlist_tracks if track_id not in track_ids]
 			if to_add or to_remove:
 				if to_remove:
-					sp.spotify.playlist_remove_all_occurrences_of_items(config['playlistId'], to_remove)
+					for i in range(0, len(to_remove), 100):
+						sp.spotify.playlist_remove_all_occurrences_of_items(config['playlistId'], to_remove[i:i+100])
 					center('[{}] Successfully removed {:,} song{} from the playlist.'.format(smart_time(), len(to_remove), 's' if len(to_remove) > 1 else ''))
 				if to_add:
 					for i in range(0, len(to_add), 100):
